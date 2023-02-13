@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10%;
+        border: solid;
+        padding: 20px;
+    }
+
+    </style>
+  <!-- Bootstrap CSS v5.2.1 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <style>
+      .nav{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-around;
+          margin-top: 5px;
+          border: solid;
+          padding: 20px;
+      }
+    </style>
+    <style>
+      * {
+        padding: 5px;
+        margin: 5px;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+
+      video,
+      canvas,
+      img {
+        width: 40%;
+        border: 1px solid black;
+      }
+
+      #status {
+        margin-top: 20px;
+        font-size: 20px;
+      }
+
+      @media (max-width: 767px) {
+        video,
+        canvas,
+        img {
+          width: 60%;
+        }
+      }
+    </style>
+  </head>
+  
+  <body>  
+    <div class="nav">
+      
+      <a href={% url 'signup' %} class="border border-primary btn"> signup</a>
+            <a href={% url 'login' %} class="border border-primary btn">login page</a>
+            <a href={% url 'login_face_recog' %} class="border border-primary btn">login using face ai</a>
+    </header>
+    </div>
+
+    {% if erorr %}
+    <div class="alert bor border text-bg-danger" role="alert">
+      <strong>{{erorr}}</strong> 
+    </div>
+    {% endif %}
+      
+      
+      <video id="video" autoplay></video>
+      <canvas id="canvas" hidden></canvas>
+      <h1>
+        <div id="timing">wait : 3 seconds</div>
+      </h1>
+      <button id="capture-button" class="bg-warning">Capture</button>
+
+      <form method="post" enctype="multipart/form-data" action= {% url 'login_face_recog' %}>
+
+        {% csrf_token %}
+        <!-- <button id="webcam-capture-button">Capture Photo from Webcam</button> -->
+        <input type="hidden" id="webcam-capture-input" name="face_image" title="image" hidden>
+        <button type="submit" id="send-button" class="bg-success border border-2 border-dark p-2 text-light" hidden>Login with Face Recognition</button>
+      </form>
+
+      <!-- <button id="send-button" hidden>Send</button> -->
+
+      <button id="recapture-button" hidden>Capture again</button>
+      <button id="stop-button" hidden>Stop camera</button>
+      <div id="status"></div>
+      <img id="image" hidden />
+      
+      <script>
+      const video = document.querySelector("#video");
+      const canvas = document.querySelector("#canvas");
+      const image = document.querySelector("#image");
+      const captureButton = document.querySelector("#capture-button");
+      const sendButton = document.querySelector("#send-button");
+      const recaptureButton = document.querySelector("#recapture-button");
+      const status = document.querySelector("#status");
+      const timing = document.querySelector("#timing");
+      const webcaminput = document.querySelector("#webcam-capture-input");
+      //const stop = document.querySelector("#stop-button");
+
+      
+      let captureTime;
+
+      async function setupWebcam() {
+        const constraints = {
+          video: {
+            width: 640,
+            height: 480
+          }
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        return new Promise((resolve) => {
+          video.onloadedmetadata = () => {
+            resolve();
+          };
+        });
+      }
+      async function timer() {
+        count = 2;
+        while (count > 0) {
+          timing.innerHTML = `wait : ${count}`;
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          count--;
+        }
+      }
+
+      async function takePhoto() {
+        captureTime = new Date();
+        timer();
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+        // captureButton.setAttribute("hidden", true);
+        sendButton.removeAttribute("hidden");
+        captureButton.innerHTML = "capture again";
+        timing.innerHTML = `wait : 3 seconds`;
+
+        // recaptureButton.removeAttribute("hidden");
+        image.setAttribute("src", canvas.toDataURL());
+        webcaminput.setAttribute("value", canvas.toDataURL());
+        image.removeAttribute("hidden");
+        status.innerHTML = `Photo captured after 5 seconds at: ${new Date().toLocaleString()}`;
+      }
+
+      async function sendPhoto() {
+        const blob = await new Promise((resolve) => {
+          canvas.toBlob(resolve);
+        });
+        const response = await fetch("https://httpbin.org/image/jpeg", {
+          method: "POST",
+          body: blob
+        });
+        if (response.ok) {
+          alert("The photo was sent successfully");
+        } else {
+          alert("An error occurred while sending the photo");
+        }
+      }
+
+      function recapturePhoto() {
+        image.setAttribute("hidden", true);
+        sendButton.setAttribute("hidden", true);
+        recaptureButton.setAttribute("hidden", true);
+        captureButton.removeAttribute("hidden");
+        const elapsedTime = (new Date() - captureTime) / 1000;
+        status.innerHTML = `Capture at ${elapsedTime} seconds at: ${new Date().toLocaleString()}`;
+      }
+
+
+      async function main() {
+        await setupWebcam();
+        video.play();
+        captureButton.addEventListener("click", takePhoto);
+        //sendButton.addEventListener("click", sendPhoto); 
+        //recaptureButton.addEventListener("click", recapturePhoto);
+      } 
+
+      main();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Title</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS v5.2.1 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <style>
+      .nav{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-around;
+          margin-top: 5px;
+          border: solid;
+          padding: 20px;
+      }
+    </style>
+</head>
+
+<body>
+  <header>
+    <!-- place navbar here -->
+    <div class="nav">
+      
+      <a href={% url 'signup' %} class="border border-primary btn"> signup</a>
+            <a href={% url 'login' %} class="border border-primary btn">login page</a>
+            <a href={% url 'login_face_recog' %} class="border border-primary btn">login using face ai</a>
+    </header>
+    </div>
+  <main>
+    {% if msg %}
+    {{msg}}
+      
+    {% endif %}
+    <h1>welcome to the page</h1>
+    <hr>
+    <div class="container d-flex flex-column m-3 p-3">
+      <a name="signup" id="signup" class="btn btn-primary p-3 m-4" href={% url 'signup' %} role="button">signup</a>
+      <a name="login" id="login" class="btn btn-primary p-3 m-4" href={% url 'login' %} role="button">login</a>
+      <a name="login_face_recog" id="login_face_recog" class="btn btn-primary p-3 m-4" href={% url 'login_face_recog' %} role="button">login_face_recog</a>
+
+          
+
+    </div>
+  
+  </main>
+  <footer>
+    <!-- place footer here -->
+  </footer>
+  <!-- Bootstrap JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+    integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
+  </script>
+</body>
+
+</html> 

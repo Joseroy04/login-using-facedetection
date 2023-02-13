@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script>
+        function takePicture() {
+            // Get the video element
+            const video = document.getElementById("webcam");
+
+            // Create a canvas element to capture the image
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext("2d").drawImage(video, 0, 0);
+
+            // Convert the canvas content to a data URL
+            const dataURL = canvas.toDataURL("image/png");
+
+            // Update the form input with the data URL
+            const input = document.getElementById("input");
+            input.src = dataURL;
+        }
+    </script>
+</head>
+
+<body>
+    <video id="webcam" width="640" height="480" autoplay></video>
+    
+        <form method="post" enctype="multipart/form-data" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input id="input" type="image" style="display:none" title="image">
+            <button type="submit" onclick="takePicture()">Take Picture</button>
+        </form>
+</body>
+
+</html>
